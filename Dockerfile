@@ -1,27 +1,19 @@
 FROM php:8.2-apache
 
-# Install system dependencies & PHP extensions
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Use official lightweight extension installer (Fixes compile error)
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-# Enable Apache mod_rewrite for Laravel routes
+RUN install-php-extensions pdo_mysql gd zip bcmath mbstring exif
+
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Configure Apache DocumentRoot to point to /public
+# Configure Apache DocumentRoot to point to Laravel /public
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Configure Apache to listen on port 80 or $PORT if needed
+# Configure Apache to listen on dynamic Render $PORT or 80
 RUN sed -i 's/80/${PORT:-80}/g' /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
 
 # Install Composer
@@ -30,18 +22,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application files
+# Copy project files
 COPY . .
 
-# Install PHP dependencies
+# Install PHP dependencies without dev packages
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Set correct storage & cache permissions
+# Set storage and cache permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expose HTTP port
 EXPOSE 80
 
-# Start script: Run migrations and launch Apache
+# Start Apache & run migrations
 CMD php artisan config:clear && php artisan migrate --force && apache2-foreground

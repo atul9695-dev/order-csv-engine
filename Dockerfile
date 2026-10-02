@@ -15,9 +15,6 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Configure Apache to listen on dynamic Render $PORT or 80
-RUN sed -i 's/80/${PORT:-80}/g' /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
-
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -36,5 +33,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 EXPOSE 80
 
-# Run configuration setup, migrations, and start Apache server
-CMD sh -c "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force; apache2-foreground"
+# Dynamically bind to Render's $PORT, clear cache, run migrations, and launch Apache
+CMD sh -c "TARGET_PORT=\${PORT:-80}; sed -i \"s/Listen .*/Listen \$TARGET_PORT/\" /etc/apache2/ports.conf; sed -i \"s/<VirtualHost \*:.*/<VirtualHost *:\$TARGET_PORT>/\" /etc/apache2/sites-available/*.conf; php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force; apache2-foreground"

@@ -1,0 +1,11 @@
+customer_name,mobile_number,email,city,state,pincode,product_name,quantity,order_amount,order_date
+Aarav Patel,9823456781,aarav.patel@example.com,Ahmedabad,Gujarat,380001,Mechanical Keyboard,1,3499.00,2026-06-10
+Pooja Nair,9812345672,pooja.nair@example.com,Kochi,Kerala,682001,Wireless Earbuds,2,2999.00,2026-06-11
+Rohan Gupta,9834567893,rohan.gupta@example.com,Bangalore,Karnataka,560001,Ultra HD Monitor,1,18500.00,2026-06-12
+Sneha Reddy,9845678904,sneha.reddy@example.com,Hyderabad,Telangana,500001,Ergonomic Chair,1,8999.00,2026-06-13
+Vikas Mishra,9856789015,vikas.mishra@example.com,Lucknow,Uttar Pradesh,226001,Smart Fitness Band,3,4500.00,2026-06-14
+Ananya Sen,9867890126,ananya.sen@example.com,Kolkata,West Bengal,700001,USB-C Hub Multiport,2,1799.00,2026-06-15
+Karan Malhotra,9878901237,karan.m@example.com,Chandigarh,Punjab,160001,Noise Cancelling Headphones,1,12499.00,2026-06-16
+Divya Joshi,9889012348,divya.joshi@example.com,Pune,Maharashtra,411001,Portable SSD 1TB,1,7200.00,2026-06-17
+Manish Singh,9890123459,manish.singh@example.com,Jaipur,Rajasthan,302001,Desk Mat & Wrist Rest,4,1999.00,2026-06-18
+Priya Bhatt,9801234560,priya.bhatt@example.com,Dehradun,Uttarakhand,248001,Webcam 1080p HD,1,2890.00,2026-06-19

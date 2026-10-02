@@ -15,7 +15,7 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Configure Apache to listen on Render $PORT or 80
+# Configure Apache to listen on dynamic Render $PORT or 80
 RUN sed -i 's/80/${PORT:-80}/g' /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf
 
 # Install Composer
@@ -34,10 +34,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Make entrypoint executable
-RUN chmod +x /var/www/html/docker-entrypoint.sh
-
 EXPOSE 80
 
-# Start with entrypoint
-ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
+# Run configuration setup, migrations, and start Apache server
+CMD sh -c "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force; apache2-foreground"
